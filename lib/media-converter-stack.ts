@@ -12,6 +12,7 @@ import {
   EC2_ROLE_NAME,
   EXT_M3U8,
   EXT_MP4,
+  FRONTEND_BUCKET_WEB_URL,
   GIT_ACTION_ROLE_NAME,
   IAM_PASS_ROLE,
   LAMBDA_SERVICE,
@@ -30,6 +31,7 @@ export class MediaConverterStack extends cdk.Stack {
     const updateVideoStatusLambdaName = `${id}-lambda-update-status-${props?.environment}-${props?.accountId}`;
     const mediaConverterLambdaName = `${id}-lambda-mdia-conv-${props?.environment}-${props?.accountId}`;
 
+    const frontendBucketWebDomain = cdk.Fn.importValue(FRONTEND_BUCKET_WEB_URL);
     const unprocessedMediaBucket = new s3.Bucket(this, uporcessedMediaBucketName, {
       bucketName: uporcessedMediaBucketName,
       encryption: s3.BucketEncryption.S3_MANAGED,
@@ -42,6 +44,7 @@ export class MediaConverterStack extends cdk.Stack {
         blockPublicPolicy: false,
         restrictPublicBuckets: false,
       }),
+      cors: getCorsConfig(frontendBucketWebDomain),
     });
 
     const processedMediaBucket = new s3.Bucket(this, processedMediaBucketName, {
@@ -91,7 +94,22 @@ export class MediaConverterStack extends cdk.Stack {
     });
 
     unprocessedMediaBucket.grantRead(mediaConvertRole);
+    unprocessedMediaBucket.grantReadWrite(ec2Role);
     processedMediaBucket.grantWrite(mediaConvertRole);
+
+    ec2Role.addToPrincipalPolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          's3:CreateMultipartUpload',
+          's3:ListMultipartUploadParts',
+          's3:CompleteMultipartUpload',
+          's3:AbortMultipartUpload',
+          's3:ListBucketMultipartUploads',
+        ],
+        resources: [unprocessedMediaBucket.bucketArn, `${unprocessedMediaBucket.bucketArn}/*`],
+      })
+    );
 
     // Use AWS SDK to get MediaConvert endpoint
     const mediaConvertClient = new AWS.MediaConvert({ region: REGIONS.usEast1 });
@@ -171,4 +189,23 @@ export class MediaConverterStack extends cdk.Stack {
       }
     );
   }
+}
+function getCorsConfig(bucketDomain: string): cdk.aws_s3.CorsRule[] | undefined {
+  const corConfigs: cdk.aws_s3.CorsRule[] = [];
+  // *** localhost for development purpose only
+  corConfigs.push({
+    allowedOrigins: ['http://localhost:5173'],
+    allowedMethods: [s3.HttpMethods.POST, s3.HttpMethods.PUT, s3.HttpMethods.GET],
+    allowedHeaders: ['*'],
+    exposedHeaders: ['ETag'],
+  });
+
+  // Dev hosted domain
+  corConfigs.push({
+    allowedOrigins: [bucketDomain],
+    allowedMethods: [s3.HttpMethods.POST, s3.HttpMethods.PUT, s3.HttpMethods.GET],
+    allowedHeaders: ['*'],
+    exposedHeaders: ['ETag'],
+  });
+  return corConfigs;
 }

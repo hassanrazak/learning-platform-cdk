@@ -16,6 +16,7 @@ import {
   WILDCARD,
   SSM_GET_COMMAND_INVOC,
   SSM_LIST_COMMAND_INVOC,
+  FRONTEND_BUCKET_WEB_URL,
 } from './constants';
 import { LpStackProps } from './interfaces';
 import * as s3 from 'aws-cdk-lib/aws-s3';
@@ -127,6 +128,11 @@ export class ContinousDeplymentStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'GitActionFrontendRoleName', {
       value: frontendGitActionRole.roleArn,
       exportName: GIT_ACTION_FRONTEND_ROLE_NAME,
+    });
+
+    new cdk.CfnOutput(this, 'FrontendBucketUrl', {
+      value: frontendAppBucket.bucketWebsiteUrl,
+      exportName: FRONTEND_BUCKET_WEB_URL,
     });
   }
 }
