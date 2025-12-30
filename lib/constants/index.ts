@@ -10,11 +10,11 @@ export const MEDIA_CONVERT_SERVICE = 'mediaconvert.amazonaws.com';
 export const LAMBDA_SERVICE = 'lambda.amazonaws.com';
 export const EC2_SERVICE = 'ec2.amazonaws.com';
 export const STS_SERVICE = 'sts.amazonaws.com';
-// "bubah/learning-platform"
-export const LP_SERVICE_REPO = 'bubah/learning-platform';
-export const LP_FRONTEND_REPO = 'bubah/learning-platform-frontend';
-// "bubah/learning-platform-cdk"
-export const LP_CDK_REPO = 'bubah/learning-platform-cdk';
+// "hassan/learning-platform"
+export const LP_SERVICE_REPO = 'hassan/learning-platform';
+export const LP_FRONTEND_REPO = 'hassan/learning-platform-frontend';
+// "hassan/learning-platform-cdk"
+export const LP_CDK_REPO = 'hassan/learning-platform-cdk';
 export const GITHUB_OIDC_TOKEN_URL = 'https://token.actions.githubusercontent.com';
 export const BRANCH = {
   master: 'master',
