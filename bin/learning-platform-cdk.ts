@@ -11,13 +11,18 @@ const env = app.node.tryGetContext('env'); // Default to 'dev' if not provided
 // Environment Configuration
 const config: IEnvConfig = {
   dev: {
-    accountId: '805358685077', // Replace with your actual account ID
+    accountId: '740994137015', // Replace with your actual account ID
     region: REGIONS.usEast1, // Replace with your desired region
     environment: 'dev',
-    whiteListedIps: ['172.56.35.116/32', '162.83.152.212/32', '100.33.64.132/32'], // Replace with your actual IPs
+    whiteListedIps: [
+      '172.56.35.116/32',
+      '162.83.152.212/32',
+      '100.33.64.132/32',
+      '24.146.244.22/32',
+    ], // Replace with your actual IPs
     lpArtifactStorage: {
       actions: ['ssm:GetParameter', 'ssm:GetParameters', 'ssm:GetParametersByPath'],
-      arn: 'arn:aws:ssm:us-east-1:805358685077:parameter/lp/dev/*',
+      arn: 'arn:aws:ssm:us-east-1:740994137015:parameter/lp/dev/*',
     },
   },
 };
@@ -30,7 +35,11 @@ if (!selectedEnvConfig) {
 
 const vpcStack = new VpcStack(app, 'lp-vpcstack', selectedEnvConfig);
 const mediaConverterStack = new MediaConverterStack(app, 'lp-mediaconvstack', selectedEnvConfig);
-const continuousDeploymentStack = new ContinousDeplymentStack(app, 'lp-cdeploystack', selectedEnvConfig);
+const continuousDeploymentStack = new ContinousDeplymentStack(
+  app,
+  'lp-cdeploystack',
+  selectedEnvConfig
+);
 mediaConverterStack.node.addDependency(vpcStack);
 mediaConverterStack.node.addDependency(continuousDeploymentStack);
 continuousDeploymentStack.node.addDependency(vpcStack);
