@@ -57,3 +57,11 @@ source_profile = bubah-dev
 - `npm run deploy:<environment>` deploy this stack to your default AWS account/region for the specified env (i.e dev, test, stage, prod)
 - `npm run diff:<environment>` compare deployed stack with current state for the specified environment (i.e dev, test, stage, prod)
 - `npx cdk synth` emits the synthesized CloudFormation template
+
+## TESTING CI/CD PIPELINE
+
+    - make a small commit
+    - push to remote feature branch
+    - merge branch to master
+    - git actions workflow should automatically start
+    - this update to readme will check this
